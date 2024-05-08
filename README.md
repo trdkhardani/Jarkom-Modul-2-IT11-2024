@@ -403,6 +403,32 @@ Hasil yang didapatkan akan seperti ini
 ![10_3](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/85aff90a-333f-40b4-b235-5daeadd73ad0)
 
 
+## SOAL NO 11
+Setelah pertempuran mereda, warga Erangel dapat kembali mengakses jaringan luar, tetapi hanya warga Pochinki saja yang dapat mengakses jaringan luar secara langsung. Buatlah konfigurasi agar warga Erangel yang berada diluar Pochinki dapat mengakses jaringan luar melalui DNS Server Pochinki.
+
+### Script (Pochinki)
+```bash
+echo ' options {
+        directory "/var/cache/bind";
+
+        forwarders {
+                8.8.8.8;
+                8.8.4.4;
+        };
+
+        dnssec-validation auto;
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+}; ' > /etc/bind/named.conf.options
+
+service bind9 restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi pada file **/etc/bind/named.conf.options** supaya DNS Server Pochinki dapat melakukan akses ke jaringan luar, menggunakan **Google Public DNS**.
+
+#### Hasil
+![no11](/images/no11.png)
+
 ## SOAL NO 12
 Karena pusat ingin sebuah website yang ingin digunakan untuk memantau kondisi markas lainnya maka deploy lah webiste ini (cek resource yg lb) pada severny menggunakan apache
 
@@ -630,4 +656,193 @@ service bind9 restart
 ```
 Script di atas dapat dijalankan untuk melakukan konfigurasi BIND supaya sistem Pochinki selaku DNS dapat mengetahui dan menerjemahkan mylta.it11.com beserta aliasnya, sehingga client yang menggunakan DNS Pochinki dapat mengakses Severny melalui mylta.it11.com atau aliasnya.
 
+#### Hasil
+![no16](/images/no16.gif)
+
 ## SOAL NO 17
+Agar aman, buatlah konfigurasi agar mylta.xxx.com hanya dapat diakses melalui port 14000 dan 14400.
+
+### Script (Severny)
+```bash
+# Severny
+
+echo ' server {
+
+        listen 14000;
+
+        root /var/www/jarkom;
+
+        index index.php index.html index.htm;
+        server_name mylta.it11.com;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ }
+ 
+        server {
+
+        listen 14400;
+
+        root /var/www/jarkom;
+
+        index index.php index.html index.htm;
+        server_name mylta.it11.com;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ } ' > /etc/nginx/sites-enabled/jarkom
+
+service nginx restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi baru pada Nginx supaya Severny hanya dapat diakses melalui port 14000 dan 14400.
+
+#### Hasil
+![no17](/images/no17.gif)
+
+## SOAL NO 18
+Apa bila ada yang mencoba mengakses IP mylta akan secara otomatis dialihkan ke www.mylta.xxx.com
+
+### Script (Severny)
+```bash
+# Severny
+
+echo ' server {
+
+        listen 80;
+
+        root /var/www/jarkom;
+
+        index index.php index.html index.htm;
+        server_name www.mylta.it11.com;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ } 
+ 
+ server {
+    listen 80 default_server;
+    server_name _;
+    return 301 http://www.mylta.it11.com;
+} ' >> /etc/nginx/sites-enabled/jarkom
+
+service nginx restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi baru pada Nginx supaya Severny dapat melakukan redirect dari IP (10.69.4.2) ke www.mylta.it11.com.
+
+#### Hasil
+![no18](/images/no18.gif)
+
+## SOAL NO 19 & 20
+Karena probset sudah kehabisan ide masuk ke salah satu worker buatkan akses direktori listing yang mengarah ke resource worker2. Worker tersebut harus dapat di akses dengan tamat.xxx.com dengan alias www.tamat.xxx.com
+
+### Script (Severny)
+```bash
+# Worker2 - Severny
+
+apt-get install unzip -y
+apt-get install wget -y
+
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=11S6CzcvLG-dB0ws1yp494IURnDvtIOcq' -O worker2.zip
+
+unzip worker2.zip -d worker2
+
+mkdir /var/www/jarkom/resources
+
+mv worker2/* /var/www/jarkom/resources
+
+echo ' server {
+    listen 80;
+    server_name tamat.it11.com www.tamat.it11.com;
+
+    root /var/www/jarkom;
+    index index.php index.html index.htm;
+
+    location /resources {
+        alias /var/www/jarkom/resources/worker2;
+        autoindex on;
+    }
+
+    error_log /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
+} ' > /etc/nginx/sites-enabled/jarkom
+
+service nginx restart
+```
+Script di atas dapat dijalankan untuk melakukan instalasi package Nginx dan PHP. Setelah itu, melakukan konfigurasi Nginx agar dapat melakukan listing dari direktori resources pada worker2.
+
+### Script (Pochinki)
+```bash
+# Pochinki (DNS)
+
+echo ' zone "tamat.it11.com" {
+ 		type master;
+ 		file "/etc/bind/jarkom/tamat.it11.com";
+ }; ' >> /etc/bind/named.conf.local
+
+mkdir /etc/bind/jarkom
+
+cp /etc/bind/db.local /etc/bind/jarkom/tamat.it11.com
+
+echo ' ;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     tamat.it11.com. root.tamat.it11.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      tamat.it11.com.
+@       IN      A       10.69.4.2
+www     IN      CNAME   tamat.it11.com. ' > /etc/bind/jarkom/tamat.it11.com
+
+service bind9 restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi BIND supaya sistem Pochinki selaku DNS dapat mengetahui dan menerjemahkan tamat.it11.com beserta aliasnya, sehingga client yang menggunakan DNS Pochinki dapat mengakses Severny melalui tamat.it11.com atau aliasnya untuk mengakses direktori listing dari worker2.
+
+#### Hasil
+![no19_20](/images/no19-20.gif)
