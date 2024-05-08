@@ -248,6 +248,7 @@ service bind9 restart
 Script dapat dijalankan untuk mengonfigurasi DNS, tepatnya pada file konfigurasi **/etc/bind/named.conf.local** dan juga **/etc/bind/jarkom/loot.it11.com** supaya domain **loot.it11.com** dan **aliasnya** dikenali oleh DNS sebagai domain dari **Mylta (10.69.4.5)**.
 
 ## SOAL NO 5
+Pastikan domain-domain tersebut dapat diakses oleh seluruh komputer (client) yang berada di Erangel
 
 ### Script (Clients - Gatka, Quarry, dan Shelter)
 ```bash
