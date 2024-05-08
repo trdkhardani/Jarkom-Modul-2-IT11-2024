@@ -423,5 +423,133 @@ Hasil yang didapatkan akan seperti ini
 
 ![Screenshot 2024-05-08 032342](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/efef5f54-c402-430c-aa68-3947db0fcc9d)
 
+## SOAL NO 14
+### Script (Web Server - Severny, Stalber, dan Lipovka)
+```bash
+echo '
+nameserver 192.168.122.1
+' > /etc/resolv.conf
+apt-get update
+apt install nginx php php-fpm -y
 
+mkdir /var/www/jarkom
 
+echo " <?php
+\$hostname = gethostname();
+\$date = date('Y-m-d H:i:s');
+\$php_version = phpversion();
+\$username = get_current_user();
+
+echo \"Hello World!<br\>\";
+echo \"Saya adalah: \$username<br\>\";
+echo \"Saat ini berada di: \$hostname<br\>\";
+echo \"Versi PHP yang saya gunakan: \$php_version<br\>\";
+echo \"Tanggal saat ini: \$date<b\r\>\";
+?>" > /var/www/jarkom/index.php
+
+echo '
+ server {
+
+        listen 80;
+
+        root /var/www/jarkom;
+
+        index index.php index.html index.htm;
+        server_name _;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ } ' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+rm -rf /etc/nginx/sites-enabled/default
+
+service nginx restart
+service php7.0-fpm stop
+service php7.0-fpm start
+
+echo '
+nameserver 10.69.1.2
+nameserver 10.69.3.2 ' > /etc/resolv.conf
+```
+Script di atas dapat dijalankan untuk melakukan instalasi package Nginx dan PHP. Setelah itu, membuat code PHP yang nantinya akan ditunjukkan ke sisi client. Terakhir, membuat konfigurasi Nginx agar code PHP tersebut dapat ditunjukkan ke client dengan cara client mengakses alamat IP dari masing-masing web server.
+
+### Script (Load Balancer - Mylta)
+```bash
+echo '
+nameserver 192.168.122.1
+#nameserver 10.69.1.2
+#nameserver 10.69.3.2
+' > /etc/resolv.conf
+apt-get update
+apt-get install bind9 nginx -y
+
+echo ' # Default menggunakan Round Robin
+ upstream myweb  {
+        server 10.69.4.2; #IP Serverny
+        server 10.69.4.3; #IP Stalber
+    server 10.69.4.4; #IP Lipovka
+ }
+
+ server {
+        listen 80;
+        server_name _;
+
+        location / {
+        proxy_pass http://myweb;
+        }
+ }' > /etc/nginx/sites-available/lb-jarkom
+
+ln -s /etc/nginx/sites-available/lb-jarkom /etc/nginx/sites-enabled/lb-jarkom
+
+rm -rf /etc/nginx/sites-enabled/default
+
+service nginx restart
+echo '
+nameserver 10.69.1.2
+nameserver 10.69.3.2
+' > /etc/resolv.conf
+```
+Script di atas dapat dijalankan untuk melakukan instalasi package Nginx dan PHP. Setelah itu, melakukan konfigurasi Nginx untuk load balancing tiga web server.
+
+### Hasil
+#### Severny
+```bash
+lynx 10.69.4.2
+```
+![web_severny](/images/no14_severny.png)
+
+#### Stalber
+```bash
+lynx 10.69.4.3
+```
+![web_stalber](/images/no14_stalber.png)
+
+#### Lipovka
+```bash
+lynx 10.69.4.4
+```
+![web_lipovka](/images/no14_lipovka.png)
+
+#### Mylta
+```bash
+lynx 10.69.4.5
+```
+![lb_mylta](/images/no14_mylta.gif)
+
+## SOAL NO 15
+Berhubung pembahasan soal no 15 ini sangat panjang, [klik di sini](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/tree/main/no15) untuk melihat pembahasan soal no 15.
