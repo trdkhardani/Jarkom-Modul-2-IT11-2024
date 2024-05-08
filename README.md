@@ -479,6 +479,7 @@ lynx http://10.69.4.5 #mylta
 
 
 ## SOAL NO 14
+Mereka juga belum merasa puas jadi pusat meminta agar web servernya dan load balancer nya diubah menjadi nginx
 ### Script (Web Server - Severny, Stalber, dan Lipovka)
 ```bash
 echo '
