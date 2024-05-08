@@ -6,6 +6,122 @@
 | 5027211049 | Tridiktya Hardani Putra |
 | 5027221008 | Jeany Aurellia Putri Dewati |
 
+## SOAL NO 1
+Untuk membantu pertempuran di Erangel, kamu ditugaskan untuk membuat jaringan komputer yang akan digunakan sebagai alat komunikasi. Sesuaikan rancangan Topologi dengan rancangan dan pembagian yang berada di link yang telah disediakan, dengan ketentuan nodenya sebagai berikut :
+* DNS Master akan diberi nama Pochinki, sesuai dengan kota tempat dibuatnya server tersebut
+* Karena ada kemungkinan musuh akan mencoba menyerang Server Utama, maka buatlah DNS Slave Georgopol yang mengarah ke Pochinki
+* Markas pusat juga meminta dibuatkan tiga Web Server yaitu Severny, Stalber, dan Lipovka. Sedangkan Mylta akan bertindak sebagai Load Balancer untuk server-server tersebut
+
+### Topologi
+![topologi_no1](/images/Screenshot%202024-05-08%20143044.png)
+
+### Konfigurasi
+#### Erangel (Router)
+```auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inet static
+	address 10.69.1.1
+	netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+	address 10.69.2.1
+	netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+	address 10.69.3.1
+	netmask 255.255.255.0
+
+auto eth4
+iface eth4 inet static
+	address 10.69.4.1
+	netmask 255.255.255.0
+```
+
+#### Pochinki (DNS Master)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.1.2
+	netmask 255.255.255.0
+	gateway 10.69.1.1
+```
+
+#### Quarry (Client)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.2.2
+	netmask 255.255.255.0
+	gateway 10.69.2.1
+```
+
+#### Shelter (Client)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.2.3
+	netmask 255.255.255.0
+	gateway 10.69.2.1
+```
+
+#### Georgopol (DNS Slave)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.3.2
+	netmask 255.255.255.0
+	gateway 10.69.3.1
+```
+
+#### Gatka (Client)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.3.3
+	netmask 255.255.255.0
+	gateway 10.69.3.1
+```
+
+#### Severny (Web Server)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.4.2
+	netmask 255.255.255.0
+	gateway 10.69.4.1
+```
+
+#### Stalber (Web Server)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.4.3
+	netmask 255.255.255.0
+	gateway 10.69.4.1
+```
+
+#### Lipovka (Web Server)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.4.4
+	netmask 255.255.255.0
+	gateway 10.69.4.1
+```
+
+#### Mylta (Load Balancer)
+```
+auto eth0
+iface eth0 inet static
+	address 10.69.4.5
+	netmask 255.255.255.0
+	gateway 10.69.4.1
+```
+
 ## SOAL NO 6
 Beberapa daerah memiliki keterbatasan yang menyebabkan hanya dapat mengakses domain secara langsung melalui alamat IP domain tersebut. Karena daerah tersebut tidak diketahui secara spesifik, pastikan semua komputer (client) dapat mengakses domain redzone.xxxx.com melalui alamat IP Severny (Notes : menggunakan pointer record)
 
