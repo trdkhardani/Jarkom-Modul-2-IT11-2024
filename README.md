@@ -6,6 +6,30 @@
 | 5027211049 | Tridiktya Hardani Putra |
 | 5027221008 | Jeany Aurellia Putri Dewati |
 
+## Inisiasi
+Sebelum memulai, ada beberapa hal yang harus dipersiapkan.
+
+### Script .bashrc Erangel
+```
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 10.69.0.0/16
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+```
+Script tersebut dijalankan secara otomatis agar Erangel dan nodes lainnya (jika mengonfigurasi /etc/resolv.conf dengan alamat IP tersebut) dapat mengakses jaringan luar.
+
+### Script .bashrc Pochinki dan Georgopol 
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt-get update
+apt-get install bind9 -y
+```
+Script tersebut dijalankan secara otomatis agar DNS Master (Pochinki) dan Slave (Georgopol) dapat mengakses jaringan luar, sehingga memungkinkan untuk melakukan update dan instalasi package, tepatnya bind9.
+
+### Script .bashrc Clients (Gatka, Quarry, dan Shelter)
+```
+echo nameserver 10.69.1.2 >> /etc/resolv.conf
+```
+Script tersebut dijalankan secara otomatis agar Clients dapat mengakses jaringan yang terhubung sesuai dengan konfigurasi dari Pochinki selaku DNS Master.
+
 ## SOAL NO 1
 Untuk membantu pertempuran di Erangel, kamu ditugaskan untuk membuat jaringan komputer yang akan digunakan sebagai alat komunikasi. Sesuaikan rancangan Topologi dengan rancangan dan pembagian yang berada di link yang telah disediakan, dengan ketentuan nodenya sebagai berikut :
 * DNS Master akan diberi nama Pochinki, sesuai dengan kota tempat dibuatnya server tersebut
@@ -13,7 +37,7 @@ Untuk membantu pertempuran di Erangel, kamu ditugaskan untuk membuat jaringan ko
 * Markas pusat juga meminta dibuatkan tiga Web Server yaitu Severny, Stalber, dan Lipovka. Sedangkan Mylta akan bertindak sebagai Load Balancer untuk server-server tersebut
 
 ### Topologi
-![topologi_no1](/images/Screenshot%202024-05-08%20143044.png)
+![topologi_no1](/images/topologi.png)
 
 ### Konfigurasi
 #### Erangel (Router)
@@ -121,6 +145,139 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 10.69.4.1
 ```
+
+## SOAL NO 2
+Karena para pasukan membutuhkan koordinasi untuk mengambil airdrop, maka buatlah sebuah domain yang mengarah ke Stalber dengan alamat airdrop.xxxx.com dengan alias www.airdrop.xxxx.com dimana xxxx merupakan kode kelompok. Contoh : airdrop.it01.com
+
+### Script (Pochinki)
+``` bash
+echo 'zone "airdrop.it11.com" {
+    type master;
+    notify yes;
+    file "/etc/bind/jarkom/airdrop.it11.com";
+};' > /etc/bind/named.conf.local
+
+mkdir /etc/bind/jarkom
+
+cp /etc/bind/db.local /etc/bind/jarkom/airdrop.it11.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     airdrop.it11.com. root.airdrop.it11.com. (
+                        2023101001      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@       IN      NS      airdrop.it11.com.
+@       IN      A       10.69.4.3     ; IP Stalber
+www     IN      CNAME   airdrop.it11.com.' > /etc/bind/jarkom/airdrop.it11.com
+
+service bind9 restart
+```
+Script dapat dijalankan untuk mengonfigurasi DNS, tepatnya pada file konfigurasi **/etc/bind/named.conf.local** dan juga **/etc/bind/jarkom/airdrop.it11.com** supaya domain **airdrop.it11.com** dan **aliasnya** dikenali oleh DNS sebagai domain dari **Stalber (10.69.4.3)**.
+
+## SOAL NO 3
+Para pasukan juga perlu mengetahui mana titik yang sedang di bombardir artileri, sehingga dibutuhkan domain lain yaitu redzone.xxxx.com dengan alias www.redzone.xxxx.com yang mengarah ke Severny
+
+### Script (Pochinki)
+```bash
+echo 'zone "redzone.it11.com" {
+    type master;
+    notify yes;
+    file "/etc/bind/jarkom/redzone.it11.com";
+};' >> /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/jarkom/redzone.it11.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     redzone.it11.com. root.redzone.it11.com. (
+                        2023101001      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@       IN      NS      redzone.it11.com.
+@       IN      A       10.69.4.2     ; IP Severny
+www     IN      CNAME   redzone.it11.com.' > /etc/bind/jarkom/redzone.it11.com
+
+service bind9 restart
+```
+Script dapat dijalankan untuk mengonfigurasi DNS, tepatnya pada file konfigurasi **/etc/bind/named.conf.local** dan juga **/etc/bind/jarkom/redzone.it11.com** supaya domain **redzone.it11.com** dan **aliasnya** dikenali oleh DNS sebagai domain dari **Severny (10.69.4.2)**.
+
+## SOAL NO 4
+Markas pusat meminta dibuatnya domain khusus untuk menaruh informasi persenjataan dan suplai yang tersebar. Informasi persenjataan dan suplai tersebut mengarah ke Mylta dan domain yang ingin digunakan adalah loot.xxxx.com dengan alias www.loot.xxxx.com
+
+### Script (Pochinki)
+```bash
+echo 'zone "loot.it11.com" {
+    type master;
+    notify yes;
+    file "/etc/bind/jarkom/loot.it11.com";
+};' >> /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/jarkom/loot.it11.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     loot.it11.com. root.loot.it11.com. (
+                        2023101001      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@       IN      NS      loot.it11.com.
+@       IN      A       10.69.4.5     ; IP Mylta
+www     IN      CNAME   loot.it11.com.' > /etc/bind/jarkom/loot.it11.com
+
+service bind9 restart
+```
+Script dapat dijalankan untuk mengonfigurasi DNS, tepatnya pada file konfigurasi **/etc/bind/named.conf.local** dan juga **/etc/bind/jarkom/loot.it11.com** supaya domain **loot.it11.com** dan **aliasnya** dikenali oleh DNS sebagai domain dari **Mylta (10.69.4.5)**.
+
+## SOAL NO 5
+
+### Script (Clients - Gatka, Quarry, dan Shelter)
+```bash
+ping airdrop.it11.com -c 4
+ping www.airdrop.it11.com -c 4
+
+ping redzone.it11.com -c 4
+ping www.redzone.it11.com -c 4
+
+ping loot.it11.com -c 4
+ping www.loot.it11.com -c 4
+```
+Script dapat dijalankan untuk menguji konektivitas masing-masing domain dan aliasnya dengan clients.
+
+### Hasil
+Screenshot di bawah ini merupakan hasil dari menjalankan script di atas.
+#### Gatka
+![no5_gatka_1](/images/no5_gatka_1.png)
+
+![no5_gatka_2](/images/no5_gatka_2.png)
+
+#### Quarry
+![no5_quarry_1](/images/no5_quarry_1.png)
+
+![no5_quarry_2](/images/no5_quarry_2.png)
+
+#### Shelter
+![no5_shelter_1](/images/no5_shelter_1.png)
+
+![no5_shelter_2](/images/no5_shelter_2.png)
 
 ## SOAL NO 6
 Beberapa daerah memiliki keterbatasan yang menyebabkan hanya dapat mengakses domain secara langsung melalui alamat IP domain tersebut. Karena daerah tersebut tidak diketahui secara spesifik, pastikan semua komputer (client) dapat mengakses domain redzone.xxxx.com melalui alamat IP Severny (Notes : menggunakan pointer record)
