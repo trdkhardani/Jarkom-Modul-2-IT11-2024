@@ -449,6 +449,34 @@ Hasil yang didapatkan akan seperti ini
 
 ![Screenshot 2024-05-08 032342](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/efef5f54-c402-430c-aa68-3947db0fcc9d)
 
+## SOAL NO 13
+Tapi pusat merasa tidak puas dengan performanya karena traffic yag tinggi maka pusat meminta kita memasang load balancer pada web nya, dengan Severny, Stalber, Lipovka sebagai worker dan Mylta sebagai Load Balancer menggunakan apache sebagai web server nya dan load balancernya
+
+### Setting pada Mylta
+
+![Screenshot 2024-05-08 204432](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/3a9c2c80-cd16-4a1c-b92f-317e2dc14e35)
+
+### Setting pada web server (Severny, Stalber, dan Lipovka)
+
+![Screenshot 2024-05-08 203645](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/8ddfd03e-af44-4fe6-9dab-13a9cef309ac)
+
+Hasil Pengujian pada klien
+
+```
+lynx http://10.69.4.2 #serverny
+lynx http://10.69.4.3 #stalber
+lynx http://10.69.4.4 #lipovka
+lynx http://10.69.4.5 #mylta
+```
+![Screenshot 2024-05-08 204224](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/5ba80cc5-199c-4152-a820-a9141ba834e4)
+
+![Screenshot 2024-05-08 204239](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/93f60262-b012-4ced-bdbb-2290f00a9f8b)
+
+![Screenshot 2024-05-08 204248](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/34fe6201-9747-4b51-aea6-41186f410c30)
+
+![Screenshot 2024-05-08 204258](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/assets/115559151/93d6b142-e3c2-465a-9ecc-9e1e6e1aec9b)
+
+
 ## SOAL NO 14
 ### Script (Web Server - Severny, Stalber, dan Lipovka)
 ```bash
