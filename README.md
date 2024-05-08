@@ -552,4 +552,82 @@ lynx 10.69.4.5
 ![lb_mylta](/images/no14_mylta.gif)
 
 ## SOAL NO 15
+Markas pusat meminta laporan hasil benchmark dengan menggunakan apache benchmark dari load balancer dengan 2 web server yang berbeda tersebut dan meminta secara detail dengan ketentuan:
+* Nama Algoritma Load Balancer
+* Report hasil testing apache benchmark 
+* Grafik request per second untuk masing masing algoritma. 
+* Analisis
+
+
+### Pembahasan
 Berhubung pembahasan soal no 15 ini sangat panjang, [klik di sini](https://github.com/trdkhardani/Jarkom-Modul-2-IT11-2024/tree/main/no15) untuk melihat pembahasan soal no 15.
+
+## SOAL NO 16
+Karena dirasa kurang aman karena masih memakai IP, markas ingin akses ke mylta memakai mylta.xxx.com dengan alias www.mylta.xxx.com (sesuai web server terbaik hasil analisis kalian)
+
+### Script (Web Server - Severny)
+```bash
+# Severny
+
+echo ' server {
+
+        listen 80;
+
+        root /var/www/jarkom;
+
+        index index.php index.html index.htm;
+        server_name mylta.it11.com www.mylta.it11.com;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ } ' > /etc/nginx/sites-enabled/jarkom
+
+service nginx restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi Nginx yang baru pada Severny supaya dapat diakses melalui domain mylta.it11.com dan aliasnya. Namun, domain ini belum dapat diakses jika belum melakukan konfigurasi pada Pochinki (DNS).
+
+### Script (DNS - Pochinki)
+```bash
+# Pochinki (DNS)
+
+echo ' zone "mylta.it11.com" {
+ 		type master;
+ 		file "/etc/bind/jarkom/mylta.it11.com";
+ }; ' > /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/jarkom/mylta.it11.com
+
+echo ' ;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     mylta.it11.com. root.mylta.it11.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      mylta.it11.com.
+@       IN      A       10.69.4.2
+www     IN      CNAME   mylta.it11.com. ' > /etc/bind/jarkom/mylta.it11.com
+
+service bind9 restart
+```
+Script di atas dapat dijalankan untuk melakukan konfigurasi BIND supaya sistem Pochinki selaku DNS dapat mengetahui dan menerjemahkan mylta.it11.com beserta aliasnya, sehingga client yang menggunakan DNS Pochinki dapat mengakses Severny melalui mylta.it11.com atau aliasnya.
+
+## SOAL NO 17

@@ -128,7 +128,7 @@ Percentage of the requests served within a certain time (ms)
 99% 79
 100% 80 (longest request)
 ```
-Analisis: Berdasarkan benchmark berikut, Stalber menunjukkan performa yang lebih unggul dibandingkan Severny dalam hal throughput, kecepatan respons, transfer data, dan konsistensi dalam penanganan permintaan. Stalber tidak hanya lebih cepat dalam menyelesaikan 1000 requests tetapi juga menunjukkan waktu maksimal yang lebih pendek dan lebih konsisten dalam waktu respons median, yang membuatnya menjadi pilihan yang lebih efektif berdasarkan data benchmark ini.
+**Analisis:** Berdasarkan benchmark berikut, Stalber menunjukkan performa yang lebih unggul dibandingkan Severny dalam hal throughput, kecepatan respons, transfer data, dan konsistensi dalam penanganan permintaan. Stalber tidak hanya lebih cepat dalam menyelesaikan 1000 requests tetapi juga menunjukkan waktu maksimal yang lebih pendek dan lebih konsisten dalam waktu respons median, yang membuatnya menjadi pilihan yang lebih efektif berdasarkan data benchmark ini.
 
 # Least Connection
 ## Script (Mylta - Load Balancer)
@@ -261,7 +261,7 @@ Percentage of the requests served within a certain time (ms)
 99% 84
 100% 89 (longest request)
 ```
-Analisis: Stalber menunjukkan sedikit keunggulan dalam hal kecepatan respons dan throughput. Ini mungkin menunjukkan bahwa alokasi sumber daya atau konfigurasi di Stalber sedikit lebih optimal untuk jenis beban yang diberikan selama benchmarking. Ini bisa disebabkan oleh variasi dalam kondisi jaringan pada saat benchmarking.
+**Analisis:** Stalber menunjukkan sedikit keunggulan dalam hal kecepatan respons dan throughput. Ini mungkin menunjukkan bahwa alokasi sumber daya atau konfigurasi di Stalber sedikit lebih optimal untuk jenis beban yang diberikan selama benchmarking. Ini bisa disebabkan oleh variasi dalam kondisi jaringan pada saat benchmarking.
 
 # IP Hash
 ## Script (Mylta - Load Balancer)
@@ -394,7 +394,7 @@ Percentage of the requests served within a certain time (ms)
 99% 80
 100% 271 (longest request)
 ```
-Analisis: Stalber unggul dalam beberapa metrik seperti requests per second dan transfer rate, tetapi outlier pada waktu layanan terpanjangnya menunjukkan potensi masalah dalam penanganan kasus-kasus tertentu yang lebih kompleks atau membutuhkan lebih banyak waktu. Severny menunjukkan distribusi waktu respons yang lebih konsisten dan stabil, tanpa adanya outlier yang ekstrem seperti di Stalber.
+**Analisis:** Stalber unggul dalam beberapa metrik seperti requests per second dan transfer rate, tetapi outlier pada waktu layanan terpanjangnya menunjukkan potensi masalah dalam penanganan kasus-kasus tertentu yang lebih kompleks atau membutuhkan lebih banyak waktu. Severny menunjukkan distribusi waktu respons yang lebih konsisten dan stabil, tanpa adanya outlier yang ekstrem seperti di Stalber.
 
 # Generic Hash
 ## Script (Mylta - Load Balancer)
@@ -527,7 +527,7 @@ Percentage of the requests served within a certain time (ms)
 99% 86
 100% 87 (longest request)
 ```
-Analisis: Severny memiliki sedikit keunggulan dalam hampir semua metrik yang diukur, termasuk requests per second yang lebih tinggi dan waktu respons yang sedikit lebih cepat. Severny menunjukkan sedikit lebih konsisten dalam waktu respons, dengan waktu penanganan request terlama yang lebih pendek dibandingkan Stalber.
+**Analisis:** Severny memiliki sedikit keunggulan dalam hampir semua metrik yang diukur, termasuk requests per second yang lebih tinggi dan waktu respons yang sedikit lebih cepat. Severny menunjukkan sedikit lebih konsisten dalam waktu respons, dengan waktu penanganan request terlama yang lebih pendek dibandingkan Stalber.
 
 ## Kesimpulan
 Dari semua hasil benchmark pada berbagai algoritma load balancing (Round Robin, Least Connections, IP Hash, dan Generic Hash), Severny cenderung menunjukkan performa yang lebih baik atau setidaknya unggul dalam beberapa aspek dalam seluruh benchmark. Secara umum, Severny tampak memiliki throughput yang baik, kecepatan respons yang konsisten, dan waktu pemrosesan yang efisien di sebagian besar pengujian. Meskipun ada beberapa aspek di mana Stalber lebih unggul.
